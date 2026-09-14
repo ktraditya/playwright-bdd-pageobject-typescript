@@ -1,22 +1,20 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 
 // https://the-internet.herokuapp.com/dropdown
 test.describe('Dropdown', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/dropdown');
+  test.beforeEach(async ({ dropdownPage }) => {
+    await dropdownPage.goto();
   });
 
-  test('defaults to the placeholder option', async ({ page }) => {
-    await expect(page.locator('#dropdown')).toHaveValue('');
+  test('defaults to the placeholder option', async ({ dropdownPage }) => {
+    await expect(dropdownPage.dropdown).toHaveValue('');
   });
 
-  test('can select Option 1 and Option 2', async ({ page }) => {
-    const dropdown = page.locator('#dropdown');
+  test('can select Option 1 and Option 2', async ({ dropdownPage }) => {
+    await dropdownPage.selectOption('Option 1');
+    await expect(dropdownPage.dropdown).toHaveValue('1');
 
-    await dropdown.selectOption({ label: 'Option 1' });
-    await expect(dropdown).toHaveValue('1');
-
-    await dropdown.selectOption({ label: 'Option 2' });
-    await expect(dropdown).toHaveValue('2');
+    await dropdownPage.selectOption('Option 2');
+    await expect(dropdownPage.dropdown).toHaveValue('2');
   });
 });

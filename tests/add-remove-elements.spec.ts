@@ -1,30 +1,22 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 
 // https://the-internet.herokuapp.com/add_remove_elements/
 test.describe('Add/Remove Elements', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/add_remove_elements/');
+  test.beforeEach(async ({ addRemoveElementsPage }) => {
+    await addRemoveElementsPage.goto();
   });
 
-  test('adds a delete button for each click', async ({ page }) => {
-    const addButton = page.getByRole('button', { name: 'Add Element' });
-    const deleteButtons = page.getByRole('button', { name: 'Delete' });
+  test('adds a delete button for each click', async ({ addRemoveElementsPage }) => {
+    await addRemoveElementsPage.addElement(3);
 
-    await addButton.click();
-    await addButton.click();
-    await addButton.click();
-
-    await expect(deleteButtons).toHaveCount(3);
+    await expect(addRemoveElementsPage.deleteButtons).toHaveCount(3);
   });
 
-  test('removes a delete button when clicked', async ({ page }) => {
-    const addButton = page.getByRole('button', { name: 'Add Element' });
-    const deleteButtons = page.getByRole('button', { name: 'Delete' });
+  test('removes a delete button when clicked', async ({ addRemoveElementsPage }) => {
+    await addRemoveElementsPage.addElement(1);
+    await expect(addRemoveElementsPage.deleteButtons).toHaveCount(1);
 
-    await addButton.click();
-    await expect(deleteButtons).toHaveCount(1);
-
-    await deleteButtons.first().click();
-    await expect(deleteButtons).toHaveCount(0);
+    await addRemoveElementsPage.deleteButtons.first().click();
+    await expect(addRemoveElementsPage.deleteButtons).toHaveCount(0);
   });
 });
