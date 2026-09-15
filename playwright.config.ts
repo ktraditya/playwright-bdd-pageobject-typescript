@@ -20,6 +20,9 @@ const bddTestDir = defineBddConfig({
   steps: ['features/steps/*.ts', 'fixtures.ts'],
 });
 
+/* Where the "setup" project saves the logged-in session for reuse. See tests/auth.setup.ts. */
+const authFile = 'playwright/.auth/user.json';
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -46,6 +49,19 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    /*
+     * Logs in once and saves the session to authFile; other projects reuse it.
+     * Uses the same device profile as the "authenticated" project below — this
+     * site's demo login binds the session to the request's User-Agent, so a
+     * mismatched UA on the next request gets treated as an invalid session.
+     */
+    {
+      name: 'setup',
+      testDir: './tests',
+      testMatch: /.*\.setup\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
@@ -66,6 +82,14 @@ export default defineConfig({
       name: 'bdd',
       testDir: bddTestDir,
       use: { ...devices['Desktop Chrome'] },
+    },
+
+    /* Specs that start already logged in, reusing the session from the "setup" project. */
+    {
+      name: 'authenticated',
+      testDir: './authenticated',
+      use: { ...devices['Desktop Chrome'], storageState: authFile },
+      dependencies: ['setup'],
     },
 
     /* Test against mobile viewports. */
