@@ -1,4 +1,4 @@
-# playwright-practice
+# playwright-bdd-pageobject-typescript
 
 Playwright test suite targeting the public demo site
 [the-internet.herokuapp.com](https://the-internet.herokuapp.com/). It exercises login,
@@ -15,8 +15,8 @@ authenticated session across tests via Playwright's storage state feature.
 ## Getting started
 
 ```bash
-git clone https://github.com/ktraditya/playwright-practice.git
-cd playwright-practice
+git clone https://github.com/ktraditya/playwright-bdd-pageobject-typescript.git
+cd playwright-bdd-pageobject-typescript
 npm install
 npx playwright install       # downloads the Chromium/Firefox/WebKit browser binaries
 ```
