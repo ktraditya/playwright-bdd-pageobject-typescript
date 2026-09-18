@@ -2,7 +2,9 @@ import { test, expect } from '../fixtures';
 
 // https://the-internet.herokuapp.com/dynamic_loading
 test.describe('Dynamic loading', () => {
-  test('example 1: element is hidden then rendered visible after loading', async ({ dynamicLoadingPage }) => {
+  test('example 1: element is hidden then rendered visible after loading', async ({
+    dynamicLoadingPage,
+  }) => {
     await dynamicLoadingPage.goto(1);
 
     await dynamicLoadingPage.start();

@@ -20,7 +20,10 @@ Then('the finish element should be hidden', async ({ dynamicLoadingPage }) => {
   await expect(dynamicLoadingPage.finish).toBeHidden();
 });
 
-Then('the finish text should eventually read {string}', async ({ dynamicLoadingPage }, text: string) => {
-  await expect(dynamicLoadingPage.finish).toBeVisible({ timeout: 10_000 });
-  await expect(dynamicLoadingPage.finish).toHaveText(text);
-});
+Then(
+  'the finish text should eventually read {string}',
+  async ({ dynamicLoadingPage }, text: string) => {
+    await expect(dynamicLoadingPage.finish).toBeVisible({ timeout: 10_000 });
+    await expect(dynamicLoadingPage.finish).toHaveText(text);
+  },
+);

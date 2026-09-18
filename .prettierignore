@@ -1,0 +1,9 @@
+.features-gen/
+playwright-report/
+test-results/
+node_modules/
+package-lock.json
+
+# custom pseudo-XML structure (<rules>, <workflow>, numbered steps) that a
+# markdown formatter misparses — verified it corrupted Planner.agent.md once already
+.github/agents/*.md

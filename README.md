@@ -90,7 +90,7 @@ This repo wires it up as two extra projects in `playwright.config.ts`:
 
 - **`setup`** (`tests/auth.setup.ts`) — a one-off "test" that logs in as `tomsmith` via
   `LoginPage` and saves the session with `page.context().storageState({ path:
-  'playwright/.auth/user.json' })`.
+'playwright/.auth/user.json' })`.
 - **`authenticated`** (`testDir: './authenticated'`) — declares `dependencies: ['setup']`
   (so Playwright always runs `setup` first) and sets `use.storageState` to that same
   file. Specs here — see `authenticated/secure-area.spec.ts` — start already logged in
@@ -118,10 +118,10 @@ browser, or capture a separate storage state file per browser.
 These currently cover **the same scenarios twice**, deliberately, as two different
 front-ends onto the same page objects:
 
-| | `tests/*.spec.ts` | `features/*.feature` |
-|---|---|---|
-| Style | Plain TypeScript, calls page objects directly | Gherkin (`Given/When/Then`), backed by step definitions that call the same page objects |
-| Runs on | chromium, firefox, webkit (3 browsers) | chromium only, via the `bdd` project |
+|          | `tests/*.spec.ts`                              | `features/*.feature`                                                                              |
+| -------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Style    | Plain TypeScript, calls page objects directly  | Gherkin (`Given/When/Then`), backed by step definitions that call the same page objects           |
+| Runs on  | chromium, firefox, webkit (3 browsers)         | chromium only, via the `bdd` project                                                              |
 | Best for | Engineers; fastest to read/write/debug as code | Anyone who wants scenarios in plain language; a template for adding BDD-style tests going forward |
 
 Both are compiled and executed by the same `playwright.config.ts` / `npx playwright
@@ -132,10 +132,42 @@ There's no separate Cucumber runner involved.
 
 This duplication is fine short-term, but worth resolving deliberately once you know
 which style you actually want going forward — either:
+
 - keep `tests/*.spec.ts` as the cross-browser regression suite and treat `features/`
   as living documentation / a BDD template, or
 - commit to BDD, delete `tests/*.spec.ts`, and add firefox/webkit projects for `bdd`
   so you don't lose cross-browser coverage.
+
+## Type checking, linting, formatting
+
+```bash
+npm run typecheck      # tsc --noEmit — strict mode, catches locator/fixture typos at compile time
+npm run lint            # eslint . — includes eslint-plugin-playwright for Playwright-specific
+                         # anti-patterns (missing await, page.waitForTimeout, weak locators, etc.)
+npm run lint:fix
+npm run format:check    # prettier --check .
+npm run format           # prettier --write .
+```
+
+`tsconfig.json` has `strict: true`. `eslint.config.js` scopes `eslint-plugin-playwright`'s rules
+to `tests/`, `features/`, and `authenticated/`, with a few rules turned off deliberately where
+they false-positive against patterns this repo actually uses on purpose:
+
+- `playwright/no-standalone-expect` off under `features/steps/` — the plugin doesn't recognize
+  `playwright-bdd`'s `Given/When/Then` as a test block, only `test()`.
+- `playwright/expect-expect` off for `**/*.setup.ts` — setup projects perform actions (e.g. log in)
+  with no assertions of their own by design.
+- `playwright/prefer-locator` off for the POM/BDD file set — it flags `dropdownPage.selectOption()`
+  as if it were the raw `page.selectOption()` API, because the rule matches on method name only.
+
+**`.github/agents/*.md` is excluded from Prettier** (see `.prettierignore`) — those files mix
+custom pseudo-XML tags (`<rules>`, `<workflow>`) with numbered lists, and Prettier's markdown
+formatter garbled one the first time it ran over them (merged two list items into broken prose).
+Don't remove that exclusion without checking the result carefully.
+
+A Husky pre-commit hook (`.husky/pre-commit`) runs `lint-staged` on every commit — ESLint
+(`--fix`) + Prettier on staged `.ts` files, Prettier alone on staged `.json`/`.yml`/`.md` files.
+It installs automatically via the `prepare` script when you run `npm install`.
 
 ## CI
 
